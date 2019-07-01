@@ -2,6 +2,8 @@ import time
 import io
 import csv
 import math
+import sys
+sys.setrecursionlimit(10000)
 
 
 # Trie related functions and classes
@@ -32,6 +34,19 @@ def add(root, word, movie_id):
     node.movie_id_if_finished = movie_id
 
 
+def list_words(trie, prefix=''):
+    movie_ids_aux_arr = []
+    my_list = []
+    for k, v in enumerate(trie.children):
+        if v.movie_id_if_finished == 0:
+            for el in list_words(v):
+                my_list.append(prefix + v.char + el)
+        else:
+            my_list.append(v.char)
+            movie_ids_aux_arr.append(v.movie_id_if_finished)
+    return my_list
+
+
 def find_prefix(root, prefix: str):
     node = root
     if not root.children:
@@ -45,7 +60,10 @@ def find_prefix(root, prefix: str):
                 break
         if not char_found:
             return 0
-    return node.movie_id_if_finished
+    if node.movie_id_if_finished != 0:
+        return node.movie_id_if_finished
+    else:
+        return node
 
 
 #  Hash Table related functions and classes
@@ -81,39 +99,120 @@ def hash_code(k):
     return math.floor(k % hash_length)
 
 
+# Free structure functions and classes
+class User(object):
+    def __init__(self, id):
+        self.id = id
+        self.rated_movies = []
+
+
+class Node(object):
+    def __init__(self, d):
+        self.data = d
+        self.left = None
+        self.right = None
+
+    def insert(self, d):
+        if self.data.id == d.id:
+            return False
+        elif d.id < self.data.id:
+            if self.left:
+                return self.left.insert(d)
+            else:
+                self.left = Node(d)
+                return True
+        else:
+            if self.right:
+                return self.right.insert(d)
+            else:
+                self.right = Node(d)
+                return True
+
+    def find(self, id):
+        if self.data.id == id:
+            return self.data
+        elif id < self.data.id and self.left:
+            return self.left.find(id)
+        elif id > self.data.id and self.right:
+            return self.right.find(id)
+        return False
+
+
+class BST(object):
+    def __init__(self):
+        self.root = None
+
+    def insert(self, d):
+        if self.root:
+            return self.root.insert(d)
+        else:
+            self.root = Node(d)
+            return True
+
+    def find(self, d):
+        if self.root:
+            return self.root.find(d)
+        else:
+            return False
+
+
 # Variables definition
 hash_length = 27281
-aux_arr = []
+movie_ids_aux_arr = []
+movie_aux_arr = []
+user_aux_arr = []
+user_tree = BST()
+user_clean_arr = []
 root = TrieNode('*')
 start = time.time()
 
 # Main logic
 
 with io.open("../inputs/movie.csv", "r", encoding="utf-8") as movie_csv,\
-        io.open("../inputs/rating.csv", "r", encoding="utf-8") as minirating_csv:
+        io.open("../inputs/minirating.csv", "r", encoding="utf-8") as rating_csv:
     movie_reader = csv.reader(movie_csv, delimiter=',')
-    minirating_reader = csv.reader(minirating_csv, delimiter=',')
+    rating_reader = csv.reader(rating_csv, delimiter=',')
     line_count = 0
     for i, row in enumerate(movie_reader):
         if i != 0:
             movie_id = row[0]
             title = row[1]
             genres = row[2]
-            while len(aux_arr) < int(movie_id):
-                aux_arr.append(None)
-            aux_arr.append(MovieDetails(genres))
+            while len(movie_aux_arr) < int(movie_id):
+                movie_aux_arr.append(None)
+            movie_aux_arr.append(MovieDetails(genres))
             add(root, title, movie_id)
-    for i, row in enumerate(minirating_reader):
+    for i, row in enumerate(rating_reader):
         if i != 0:
-            movie_id = row[1]
+            user_id = int(row[0])
+            movie_id = int(row[1])
             rating = row[2]
-            aux_arr[int(movie_id)].movie_id = int(movie_id)
-            aux_arr[int(movie_id)].rating_number += 1
-            aux_arr[int(movie_id)].rating_total = aux_arr[int(movie_id)].rating_total + float(rating)
+            if len(user_aux_arr) <= user_id:
+                while len(user_aux_arr) < user_id:
+                    user_aux_arr.append(None)
+                user_aux_arr.append(User(user_id))
+            else:
+                user_aux_arr[user_id] = User(user_id)
+            user_aux_arr[user_id].rated_movies.append(movie_id)
+            movie_aux_arr[movie_id].movie_id = movie_id
+            movie_aux_arr[movie_id].rating_number += 1
+            movie_aux_arr[movie_id].rating_total = movie_aux_arr[movie_id].rating_total + float(rating)
 
-clean_arr = [x for x in aux_arr if x is not None]
-movie_hash_table = chaining_hash_table(clean_arr)
-# print(find_prefix(root, 'Grumpier Old Men (1995)'))
+for x in user_aux_arr:
+    if x is not None:
+        x.rated_movies = list(map(lambda index: movie_aux_arr[index], x.rated_movies))
+        user_tree.insert(x)
+# print(user_tree.find(48644).rated_movies[0].genres)
+movie_clean_arr = [x for x in movie_aux_arr if x is not None]
+movie_hash_table = chaining_hash_table(movie_clean_arr)
 # print(find_in_chaining_hash_table(movie_hash_table, 260).rating_number)
 end = time.time()
 print(end - start)
+
+query = input("Enter a query: ")
+query_function = query.split()[0]
+query_param = query.replace(query_function + " ", "")
+
+if query_function == "movie":
+    print(list_words(find_prefix(root, query_param), query_param))
+    print(movie_ids_aux_arr)
