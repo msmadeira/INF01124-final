@@ -88,6 +88,18 @@ def find_in_chaining_hash_table(hash_table, el):
     return -1
 
 
+def find_genre_in_chaining_hash_table(hash_table, genre, min_rating_count):
+    movie_bidimensional_list = [x for x in hash_table if len(x) > 0]
+    aux_list = []
+    formatted_genre = genre.replace("'", "")
+    for movies in movie_bidimensional_list:
+        for movie in movies:
+            genres = movie.genres.split("|")
+            if formatted_genre in genres and movie.rating_number >= min_rating_count:
+                aux_list.append(movie)
+    return aux_list
+
+
 def chaining_hash_table(lst):
     hash_table = [[] for i in range(hash_length)]
     for movie_detail in lst:
@@ -167,6 +179,19 @@ class BST(object):
 # Miscellaneous
 
 
+def bubble_sort(lst):
+    elements = len(lst)-1
+    ordered = False
+    while not ordered:
+        ordered = True
+        for i in range(elements):
+            if lst[i].rating_total > lst[i+1].rating_total:
+                lst[i], lst[i+1] = lst[i+1], lst[i]
+                ordered = False
+    lst.reverse()
+    return lst
+
+
 def query_menu():
     query = input("Enter a query: ")
     query_function = query.split()[0]
@@ -200,15 +225,30 @@ def query_menu():
             writer = csv.writer(f)
             writer.writerow(['user_rating', 'title', 'global_rating', 'count'])
             for movie in user.rated_movies:
-                # movieName = list_words(find_prefix(root, movie.movie_id), movie.movie_id)
                 writer.writerow([movie.user_rating, movie.movie_name, movie.rating_total, movie.rating_number])
             f.close()
             print('Query output file generated')
         query_menu()
     else:
-        print('Query function not found')
+        if "top" in query_function:
+            how_many = int(query_function[3:])
+            # mudar na apresentacao
+            movies_by_genre = find_genre_in_chaining_hash_table(movie_hash_table, query_param, 10)
+            mov = bubble_sort(movies_by_genre)
+            if len(mov) == 0:
+                print('Not found any movie with given genre')
+            else:
+                f = open("query_output.csv", "w+")
+                writer = csv.writer(f)
+                writer.writerow(['title', 'genres', 'rating', 'count'])
+                for i, movie in enumerate(mov):
+                    if i < how_many:
+                        writer.writerow([movie.movie_name, movie.genres, movie.rating_total, movie.rating_number])
+                f.close()
+                print('Query output file generated')
+        else:
+            print('Query function not found')
         query_menu()
-
 
 
 # Variables definition

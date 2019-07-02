@@ -1,3 +1,11 @@
-user_rating,title,global_rating,count
-4.5,Juliet of the Spirits (Giulietta degli spiriti) (1965),4.75,2
-4.0,Midnight Cowboy (1969),4.0,1
+title,genres,rating,count
+Schindler's List (1993),Drama|War,4.571428571428571,14
+"Shawshank Redemption, The (1994)",Crime|Drama,4.523809523809524,21
+Pulp Fiction (1994),Comedy|Crime|Drama|Thriller,4.3,15
+Forrest Gump (1994),Comedy|Drama|Romance|War,4.2,15
+2001: A Space Odyssey (1968),Adventure|Drama|Sci-Fi,4.0,10
+Braveheart (1995),Action|Drama|War,3.9545454545454546,11
+Babe (1995),Children|Drama,3.85,10
+"Lion King, The (1994)",Adventure|Animation|Children|Drama|Musical|IMAX,3.6538461538461537,13
+American Beauty (1999),Comedy|Drama,3.65,10
+Ghost (1990),Comedy|Drama|Fantasy|Romance|Thriller,3.65,10
