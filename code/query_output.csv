@@ -1,14 +1,5 @@
-movieId,title,genres,rating,count
-1,Toy Story (1995),Adventure|Animation|Children|Comedy|Fantasy,3.7962962962962963,27
-3114,Toy Story 2 (1999),Adventure|Animation|Children|Comedy|Fantasy,3.933333333333333,15
-78499,Toy Story 3 (2010),Adventure|Animation|Children|Comedy|Fantasy|IMAX,3.5,5
-106022,Toy Story of Terror (2013),Animation|Children|Comedy,0.0,0
-115875,Toy Story Toons: Hawaiian Vacation (2011),Adventure|Animation|Children|Comedy|Fantasy,0.0,0
-115879,Toy Story Toons: Small Fry (2011),Adventure|Animation|Children|Comedy|Fantasy,0.0,0
-120468,Toy Story Toons: Partysaurus Rex (2012),Animation|Children|Comedy,0.0,0
-120474,Toy Story That Time Forgot (2014),Animation|Children,0.0,0
-5843,Toy Soldiers (1991),Action|Drama,0.0,0
-2253,Toys (1992),Comedy|Fantasy,3.0,2
-83439,Toys in the Attic (1963),Drama,0.0,0
-4929,"Toy, The (1982)",Comedy,0.0,0
-81981,"Toy, The (Le jouet) (1976)",Comedy,0.0,0
+title,genres,rating,count
+City of God (Cidade de Deus) (2002),Action|Adventure|Crime|Drama|Thriller,4.23541,12937
+Elite Squad: The Enemy Within (Tropa de Elite 2 - O Inimigo Agora É Outro) (2010),Action|Crime|Drama,3.94661,590
+Carandiru (2003),Crime|Drama,3.705085,295
+Cazuza - O Tempo Não Pára (2004),Drama,3.15625,16
