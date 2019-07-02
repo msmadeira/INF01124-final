@@ -1,11 +1,14 @@
-title,genres,rating,count
-Schindler's List (1993),Drama|War,4.571428571428571,14
-"Shawshank Redemption, The (1994)",Crime|Drama,4.523809523809524,21
-Pulp Fiction (1994),Comedy|Crime|Drama|Thriller,4.3,15
-Forrest Gump (1994),Comedy|Drama|Romance|War,4.2,15
-2001: A Space Odyssey (1968),Adventure|Drama|Sci-Fi,4.0,10
-Braveheart (1995),Action|Drama|War,3.9545454545454546,11
-Babe (1995),Children|Drama,3.85,10
-"Lion King, The (1994)",Adventure|Animation|Children|Drama|Musical|IMAX,3.6538461538461537,13
-American Beauty (1999),Comedy|Drama,3.65,10
-Ghost (1990),Comedy|Drama|Fantasy|Romance|Thriller,3.65,10
+movieId,title,genres,rating,count
+1,Toy Story (1995),Adventure|Animation|Children|Comedy|Fantasy,3.7962962962962963,27
+3114,Toy Story 2 (1999),Adventure|Animation|Children|Comedy|Fantasy,3.933333333333333,15
+78499,Toy Story 3 (2010),Adventure|Animation|Children|Comedy|Fantasy|IMAX,3.5,5
+106022,Toy Story of Terror (2013),Animation|Children|Comedy,0.0,0
+115875,Toy Story Toons: Hawaiian Vacation (2011),Adventure|Animation|Children|Comedy|Fantasy,0.0,0
+115879,Toy Story Toons: Small Fry (2011),Adventure|Animation|Children|Comedy|Fantasy,0.0,0
+120468,Toy Story Toons: Partysaurus Rex (2012),Animation|Children|Comedy,0.0,0
+120474,Toy Story That Time Forgot (2014),Animation|Children,0.0,0
+5843,Toy Soldiers (1991),Action|Drama,0.0,0
+2253,Toys (1992),Comedy|Fantasy,3.0,2
+83439,Toys in the Attic (1963),Drama,0.0,0
+4929,"Toy, The (1982)",Comedy,0.0,0
+81981,"Toy, The (Le jouet) (1976)",Comedy,0.0,0
