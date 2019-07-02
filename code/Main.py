@@ -35,22 +35,26 @@ def add(root, word, movie_id):
 
 
 def list_words(trie, prefix=''):
-    movie_ids_aux_arr = []
+    global movie_ids_aux_arr
     my_list = []
-    for k, v in enumerate(trie.children):
-        if v.movie_id_if_finished == 0:
-            for el in list_words(v):
-                my_list.append(prefix + v.char + el)
-        else:
-            my_list.append(v.char)
-            movie_ids_aux_arr.append(v.movie_id_if_finished)
+    if len(trie.children) == 0 and prefix != '':
+        my_list.append(prefix)
+        movie_ids_aux_arr.append(trie.movie_id_if_finished)
+    else:
+        for k, v in enumerate(trie.children):
+            if v.movie_id_if_finished == 0:
+                for el in list_words(v):
+                    my_list.append(prefix + v.char + el)
+            else:
+                my_list.append(v.char)
+                movie_ids_aux_arr.append(v.movie_id_if_finished)
     return my_list
 
 
 def find_prefix(root, prefix: str):
     node = root
     if not root.children:
-        return False, 0
+        return False
     for char in prefix:
         char_found = False
         for child in node.children:
@@ -59,20 +63,19 @@ def find_prefix(root, prefix: str):
                 node = child
                 break
         if not char_found:
-            return 0
-    if node.movie_id_if_finished != 0:
-        return node.movie_id_if_finished
-    else:
-        return node
+            return False
+    return node
 
 
 #  Hash Table related functions and classes
 class MovieDetails(object):
-    def __init__(self, movie_genres):
+    def __init__(self, movie_id, movie_genres, movie_name):
         self.genres = movie_genres
+        self.movie_id = movie_id
+        self.movie_name = movie_name
         self.rating_total = 0.0
         self.rating_number = 0
-        self.movie_id = 0
+        self.user_rating = 0
 
 
 def find_in_chaining_hash_table(hash_table, el):
@@ -104,6 +107,12 @@ class User(object):
     def __init__(self, id):
         self.id = id
         self.rated_movies = []
+
+
+class UserMovieDetailsAux(object):
+    def __init__(self, id, rating):
+        self.movie_id = id
+        self.user_rating = rating
 
 
 class Node(object):
@@ -155,6 +164,52 @@ class BST(object):
         else:
             return False
 
+# Miscellaneous
+
+
+def query_menu():
+    query = input("Enter a query: ")
+    query_function = query.split()[0]
+    query_param = query.replace(query_function + " ", "")
+
+    if query_function == "movie":
+        global movie_ids_aux_arr
+        global root
+        global movie_hash_table
+        movie_ids_aux_arr = []
+        trie_prefix = find_prefix(root, query_param)
+        if not trie_prefix:
+            print('Movie not found')
+        else:
+            f = open("query_output.csv", "w+")
+            writer = csv.writer(f)
+            movies = list_words(trie_prefix, query_param)
+            writer.writerow(['movieId', 'title', 'genres', 'rating', 'count'])
+            for i, movie in enumerate(movies):
+                movie_details = find_in_chaining_hash_table(movie_hash_table, int(movie_ids_aux_arr[i]))
+                writer.writerow([movie_ids_aux_arr[i], movie, movie_details.genres, movie_details.rating_total, movie_details.rating_number])
+            f.close()
+            print('Query output file generated')
+        query_menu()
+    elif query_function == "user":
+        user = user_tree.find(int(query_param))
+        if not user:
+            print('User not found')
+        else:
+            f = open("query_output.csv", "w+")
+            writer = csv.writer(f)
+            writer.writerow(['user_rating', 'title', 'global_rating', 'count'])
+            for movie in user.rated_movies:
+                # movieName = list_words(find_prefix(root, movie.movie_id), movie.movie_id)
+                writer.writerow([movie.user_rating, movie.movie_name, movie.rating_total, movie.rating_number])
+            f.close()
+            print('Query output file generated')
+        query_menu()
+    else:
+        print('Query function not found')
+        query_menu()
+
+
 
 # Variables definition
 hash_length = 27281
@@ -169,7 +224,7 @@ start = time.time()
 # Main logic
 
 with io.open("../inputs/movie.csv", "r", encoding="utf-8") as movie_csv,\
-        io.open("../inputs/minirating.csv", "r", encoding="utf-8") as rating_csv:
+        io.open("../inputs/miniminirating.csv", "r", encoding="utf-8") as rating_csv:
     movie_reader = csv.reader(movie_csv, delimiter=',')
     rating_reader = csv.reader(rating_csv, delimiter=',')
     line_count = 0
@@ -180,7 +235,7 @@ with io.open("../inputs/movie.csv", "r", encoding="utf-8") as movie_csv,\
             genres = row[2]
             while len(movie_aux_arr) < int(movie_id):
                 movie_aux_arr.append(None)
-            movie_aux_arr.append(MovieDetails(genres))
+            movie_aux_arr.append(MovieDetails(int(movie_id), genres, title))
             add(root, title, movie_id)
     for i, row in enumerate(rating_reader):
         if i != 0:
@@ -191,28 +246,23 @@ with io.open("../inputs/movie.csv", "r", encoding="utf-8") as movie_csv,\
                 while len(user_aux_arr) < user_id:
                     user_aux_arr.append(None)
                 user_aux_arr.append(User(user_id))
-            else:
+            elif user_aux_arr[user_id] is None:
                 user_aux_arr[user_id] = User(user_id)
-            user_aux_arr[user_id].rated_movies.append(movie_id)
-            movie_aux_arr[movie_id].movie_id = movie_id
+            user_aux_arr[user_id].rated_movies.append(UserMovieDetailsAux(movie_id, float(rating)))
             movie_aux_arr[movie_id].rating_number += 1
             movie_aux_arr[movie_id].rating_total = movie_aux_arr[movie_id].rating_total + float(rating)
 
 for x in user_aux_arr:
     if x is not None:
-        x.rated_movies = list(map(lambda index: movie_aux_arr[index], x.rated_movies))
+        aux_list = []
+        for i, rated_movie in enumerate(x.rated_movies):
+            x.rated_movies[i] = movie_aux_arr[rated_movie.movie_id]
+            x.rated_movies[i].user_rating = rated_movie.user_rating
         user_tree.insert(x)
-# print(user_tree.find(48644).rated_movies[0].genres)
 movie_clean_arr = [x for x in movie_aux_arr if x is not None]
 movie_hash_table = chaining_hash_table(movie_clean_arr)
 # print(find_in_chaining_hash_table(movie_hash_table, 260).rating_number)
 end = time.time()
 print(end - start)
 
-query = input("Enter a query: ")
-query_function = query.split()[0]
-query_param = query.replace(query_function + " ", "")
-
-if query_function == "movie":
-    print(list_words(find_prefix(root, query_param), query_param))
-    print(movie_ids_aux_arr)
+query_menu()
